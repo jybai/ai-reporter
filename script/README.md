@@ -25,5 +25,5 @@ For ADDA, in addition for initialization the pretrained Unet is furthered used t
 ```
 ### Unet ADDA (unpaired input-output)
 ```
-./train_adda.sh [SRC_A_DIR] [SRC_B_DIR] [TGT_DIR] [LOG_DIR] [PRETRAINED_A_UNET_PATH] 
+./train_adda.sh [SRC_A_DIR] [SRC_B_DIR] [LOG_DIR] [PRETRAINED_A_UNET_PATH] 
 ```
