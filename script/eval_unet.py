@@ -14,7 +14,7 @@ from networks import define_G
 # from BNNBench.trainer.ensemble_trainer import test_epoch
 from BNNBench.data.paired_data import get_loader_with_dir
 
-from utils import get_constant_dim_mask
+from utils import get_constant_dim_mask, remove_prefix
 from msu_net import MSU_Net
 
 def process_imgs(imgs):
@@ -32,6 +32,7 @@ def process_imgs(imgs):
 def parse_arguments():
     parser = argparse.ArgumentParser("Launch the ensemble evaluater")
     parser.add_argument("--arch", type=str, choices=['unet', 'msunet'])
+    parser.add_argument("--split", type=str, default='test', choices=['train', 'test'])
     parser.add_argument(
         "--src-dir",
         type=str,
@@ -56,6 +57,8 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    args.src_dir = os.path.join(args.src_dir, args.split)
+    args.tgt_dir = os.path.join(args.tgt_dir, args.split)
     test_loader, fnames = get_loader_with_dir(
         args.src_dir, args.tgt_dir, args.img_size, args.batch_size, is_train=False
     )
@@ -71,6 +74,9 @@ def main():
             state_dict = state_dict["state_dict"]
             prefix = "G."
             state_dict = {k[len(prefix):]: v for k, v in state_dict.items() if k.startswith(prefix)}
+        else:
+            state_dict = {remove_prefix(k, 'module.'): v for k, v in state_dict.items()}
+
         model.load_state_dict(state_dict)
     elif args.arch == 'msunet':
         # model = MSU_Net(in_nc, out_nc)

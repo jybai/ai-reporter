@@ -1,5 +1,10 @@
 import numpy as np
 
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
 def get_constant_dim_mask(img):
     mask = []
     for img_ in img:

@@ -15,8 +15,9 @@ def parse_arguments():
     parser = ArgumentParser()
 
     # add PROGRAM level args
-    parser.add_argument("--data_dir_A", type=str)
-    parser.add_argument("--data_dir_B", type=str)
+    parser.add_argument("--data_dir_A_src", type=str)
+    parser.add_argument("--data_dir_B_src", type=str)
+    parser.add_argument("--data_dir_B_tgt", type=str)
     parser.add_argument("--bsize", type=int, default=8)
     parser.add_argument("--out_imsize", type=int, default=1024)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -38,13 +39,14 @@ def main():
 
     model = LitAddaUnet(**vars(args))
 
-    dm_train = LitUnalignedDM(dir_A=args.data_dir_A, dir_B=args.data_dir_B, 
+    dm_train = LitUnalignedDM(src_dir=args.data_dir_A_src, tgt_dir=args.data_dir_B_src, 
                               out_imsize=args.out_imsize, bsize=args.bsize, 
                               num_workers=args.num_workers,
                               max_B_size=args.max_B_size)
     dl_train = dm_train.train_dataloader()
 
-    dm_test = LitAlignedDM(data_dir=args.data_dir_B,
+    dm_test = LitAlignedDM(src_dir=args.data_dir_B_src,
+                           tgt_dir=args.data_dir_B_tgt,
                            out_imsize=args.out_imsize, bsize=1, 
                            num_workers=args.num_workers)
     dl_test = dm_test.test_dataloader()

@@ -25,5 +25,15 @@ For ADDA, in addition for initialization the pretrained Unet is furthered used t
 ```
 ### Unet ADDA (unpaired input-output)
 ```
-./train_adda.sh [SRC_A_DIR] [SRC_B_DIR] [LOG_DIR] [PRETRAINED_A_UNET_PATH] 
+./train_adda.sh [SRC_A_DIR] [SRC_B_DIR] [TGT_B_DIR] [LOG_DIR] [PRETRAINED_A_UNET_PATH] [KWARGS]
+```
+`KWARGS` are optinal but should at least specify `--max_epochs [MAX_EPOCHS]`.
+### Evaluation
+#### pixel-wise Unet
+```
+./eval_unet_v2.sh [MODEL_ARCH|'unet','msunet'] [DATA_SPLIT|'train','test'] [SRC_A_DIR] [TGT_A_DIR] [LOAD_CKPT_PATH]
+```
+#### Unet GAN and Unet ADDA
+```
+./eval_unet_v2.sh [MODEL_ARCH|'unet','msunet'] [DATA_SPLIT|'train','test'] [SRC_A_DIR] [TGT_A_DIR] [LOAD_CKPT_PATH] "--load_from_pl"
 ```

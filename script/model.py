@@ -12,7 +12,7 @@ import pytorch_lightning as pl
 
 # from BNNBench.backbones.unet import define_G
 from networks import define_G, define_D
-from utils import get_constant_dim_mask
+from utils import get_constant_dim_mask, remove_prefix
 from msu_net import MSU_Net
 
 class LitI2IPaired(pl.LightningModule):
@@ -223,7 +223,9 @@ class LitUnetGAN(LitI2IGAN):
                           use_dropout=not self.hparams.no_dropout_G)
         if (self.hparams.pretrained_unet_path != 'None') and \
            (self.hparams.pretrained_unet_path is not None):
-            self.G.load_state_dict(torch.load(self.hparams.pretrained_unet_path))
+            state_dict = torch.load(self.hparams.pretrained_unet_path)
+            state_dict = {remove_prefix(k, 'module.'): v for k, v in state_dict.items()}
+            self.G.load_state_dict(state_dict)
             print(f"Loading pretrained weight from {self.hparams.pretrained_unet_path}")
 
         self.D = define_D(self.hparams.out_nc, self.hparams.ndf, 'basic',
@@ -290,14 +292,18 @@ class LitAddaUnet(LitI2IGAN):
         self.G_A = define_G(self.hparams.in_nc, self.hparams.out_nc, 
                             self.hparams.ngf, "unet_256", norm="batch", 
                             use_dropout=not self.hparams.no_dropout_G).eval()
-        self.G_A.load_state_dict(torch.load(self.hparams.pretrained_unet_path))
+        state_dict = torch.load(self.hparams.pretrained_unet_path)
+        state_dict = {remove_prefix(k, 'module.'): v for k, v in state_dict.items()}
+        self.G_A.load_state_dict(state_dict)
+        # self.G_A.load_state_dict(torch.load(self.hparams.pretrained_unet_path))
         for p in self.G_A.parameters():
             p.requires_grad = False
 
         self.G = define_G(self.hparams.in_nc, self.hparams.out_nc, 
                           self.hparams.ngf, "unet_256", norm="batch", 
                           use_dropout=not self.hparams.no_dropout_G)
-        self.G.load_state_dict(torch.load(self.hparams.pretrained_unet_path))
+        self.G.load_state_dict(state_dict)
+        # self.G.load_state_dict(torch.load(self.hparams.pretrained_unet_path))
 
         self.D = define_D(self.hparams.out_nc, self.hparams.ndf, 'basic',
                           n_layers_D=3, norm="batch")
